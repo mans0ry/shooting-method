@@ -5,7 +5,7 @@ def u( x ):
 	"""
 	Функция, на которой проводится исследования
 	"""
-	return x ** 2
+	return x ** 3 + 2 * x
 
 def v( x ):
 	"""
@@ -36,8 +36,47 @@ def grid( a, b, n ):
 
 	return arrayOfX	
 
-def methodEuler( xn, a, b ):
-	B = v ( b )
+def setUnVn( xn ):
+	'''
+	Создание un, vn
+	'''
+	un, vn = [], []
+
+	for it in xn:
+		un.append(round(u(it), 2) )
+		vn.append(round(v(it), 2) )
+	print 'yn =', un 
+	print 'zn =', vn
+	return un, vn
+
+def f1(x, u, v):
+	return v
+
+def f2(x, u, v):
+	return 6 * x	
+
+def methodEuler( x0, y0, z0, h, n):
+	'''
+	Реализация метода Эйлера
+	'''
+	yn, zn = [], []
+	for each in xrange( 1, n ):
+
+		y1 = y0 + f1(x0, y0, z0) * h
+		z1 = z0 + f2(x0, y0, z0) * h
+
+		yn.append(round(y1, 2))
+		zn.append(round(z1, 2))
+
+		x0 = x0 + h
+		y0 = y1
+		z0 = z1
+	return yn, zn		
 	
 xn = grid( 0, 1, 10 ) 
-methodEuler( xn, 0, 1 )
+print '---------------Exact number---------------'
+unnew, vnnew = setUnVn(xn)
+un, vn = methodEuler( 0, 0, 2, 0.1, 10 )
+print '---------------Eulers method--------------'
+print 'yn =', un 
+print 'zn =', vn

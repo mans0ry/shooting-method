@@ -1,6 +1,10 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 
+constn = 100
+a, b = 0, 1
+consth = round( a + b , 2) / constn
+
 def u( x ):
 	"""
 	Функция, на которой проводится исследования
@@ -45,7 +49,9 @@ def setUnVn( xn ):
 	for it in xn:
 		un.append( round( u( it ), 2 ) )
 		vn.append( round( v( it ), 2 ) )
-	print 'yn =', un 
+	un.reverse()
+	vn.reverse()	
+	print 'yn =', un
 	print 'zn =', vn
 	return un, vn
 
@@ -62,28 +68,30 @@ def f2( x, u, vv ):
 	dv = derivative( v ) 
 	return dv( x ) 
 
-def methodEuler( x0, y0, z0, h, n):
+def methodEuler( xlast, ylast, zlast, h, n):
 	'''
 	Реализация метода Эйлера
+
 	'''
 	yn, zn = [], []
-	for each in xrange( 1, n ):
+	for each in xrange( n, 1, -1):
 
-		y1 = y0 + f1( x0, y0, z0 ) * h
-		z1 = z0 + f2( x0, y0, z0 ) * h
+		ycurrent = ylast - f1( xlast, ylast, zlast ) * h
+		zcurrent = zlast - f2( xlast, ylast, zlast ) * h
 
-		yn.append( round( y1, 2 ) )
-		zn.append( round( z1, 2 ) )
+		yn.append( round( ycurrent, 2 ) )
+		zn.append( round( zcurrent, 2 ) )
 
-		x0 = x0 + h
-		y0 = y1
-		z0 = z1
+		xlast = xlast - h
+		ylast = ycurrent
+		zlast = zcurrent
+
 	print 'yn =', yn 
 	print 'zn =', zn	
 	return yn, zn		
 
-xn = grid( 0, 1, 10 ) 
+xn = grid( 0, 1, constn ) 
 print '-' * 20, 'Exact number', '-' * 20
 unnew, vnnew = setUnVn( xn )
 print '-' * 20, 'Eulers method', '-' * 20
-un, vn = methodEuler( 0, 0, 2, 0.1, 10 )
+un, vn = methodEuler( 1, 3, 5, consth, constn )

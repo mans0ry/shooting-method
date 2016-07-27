@@ -1,8 +1,6 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 
-from prettytable import PrettyTable
-
 def u( x ):
 	"""
 	Функция, на которой проводится исследования
@@ -13,10 +11,20 @@ def v( x ):
 	"""
 	Первая производная функции
 	"""
-	return 3 * x * x + 2
+	du = derivative( u )
+	return du( x )
 
 def dv( x ):
-	return 6 * x
+	dv = derivative(v)
+	return dv(x)
+
+def derivative( functinon ):
+	"""
+	Функция для вычисления производной
+	"""
+	def df( x, h = 0.1e-3 ):
+		return ( functinon( x + h / 2 ) - functinon( x - h / 2) ) / h
+	return df	
 
 def grid( a, b, n, h ):
 	"""
@@ -30,6 +38,8 @@ def grid( a, b, n, h ):
 		lv = lv - h
 		arrayOfX.append( round( lv, 3) )
 
+	print 'xn =', arrayOfX
+	print '-' * 40
 	return arrayOfX	
 
 def methodEuler( xlast, ylast, zlast, h, n ):
@@ -51,6 +61,9 @@ def methodEuler( xlast, ylast, zlast, h, n ):
 		xlast = xlast - h
 		ylast = ycurrent
 		zlast = zcurrent
+
+	print 'yn =', yn 
+	print 'zn =', zn
 
 	return yn, zn	
 
@@ -74,64 +87,39 @@ def readValues(name):
 def Fi(alp):
 	u, z = methodEuler(b, alp, B, h, n)
 	# print u[0]
-	# print u[n] - A
-	return u[n] - A, u, z
+	return u[n] - A
 
 def main():
-	global yexact, zexact, A, B, a, b, n, h, alpha0, alpha1, result, table, usolve, zsolve
-	table = PrettyTable()
+	global A, B, a, b, n, h, alpha0, alpha1
 	A, B, a, b, alpha0, alpha1, n, h, EPS = readValues('input.txt')
-	yexact, zexact = [], []
-	result = open('result.txt', 'w+')
 	xn = grid(a, b, n, h)
-	for each in xn:
-		yexact.append(u(each))
-		zexact.append(v(each))
-
-	table.add_column('x', xn)
-	table.add_column('yexact', yexact)
-	table.add_column('zexact', zexact)
-
-	Fi0, usolve, zsolve = Fi( alpha0 )
-	Fi1, usolve, zsolve = Fi( alpha1 )
+	
+	Fi0 = Fi( alpha0 )
+	Fi1 = Fi( alpha1 )
 	k = 0
-
-	result.write('Starting parameters:\n')
-
-	result.write('A = {0}, B = {1}, a = {2}, b = {3}, n = {4}, h = {5}, alpha0 = {6}, alpha1 = {7}\n'.format(A, B, a, b, n, h, alpha0, alpha1))
 
 	if abs( Fi0 ) > EPS:
 	 	if  abs( Fi1 ) > EPS:
 	 		while Fi0 * Fi1 < 0 and k < 1000:
  				if alpha0 >= alpha1:
-					result.write('Error get alpha')
+					print 'Error get alpha'
 					break
  				k += 1
  				alpha2 = (alpha0 + alpha1)/2.
-	 			Fi2, usolve, zsolve = Fi(alpha2)
+	 			Fi2 = Fi(alpha2)
 	 			if abs(Fi2) > EPS:
 	 				if Fi0 * Fi2 < 0:
 	 					alpha1 = alpha2 
-	 					Fi1, usolve, zsolve = Fi(alpha2)
+	 					Fi1 = Fi(alpha2)
 	 				else:
 	 					alpha0 = alpha2 
-	 					Fi0, usolve, zsolve = Fi(alpha2)	
+	 					Fi0 = Fi(alpha2)	
 	 			else:
-	 				return Fi2, usolve, zsolve	
+	 				return Fi2	
 	 	else:
-	 		return Fi1, usolve, zsolve	
+	 		return Fi1	
 	else:
-		return Fi0, usolve, zsolve 	
+		return Fi0
 
-fi, usolve, zsolve = main()		
-table.add_column('usolve', usolve)
-table.add_column('zsolve', zsolve)
-ufault, zfault = [], []	
-for i in range(len(usolve)):
-	ufault.append(round(abs(usolve[i] - yexact[i]), 7))
-	zfault.append(round(abs(zsolve[i] - zexact[i]), 7))
-table.add_column('ufault', ufault)
-table.add_column('zfault', zfault)	
-result.write(str(table))
-result.write('\n')
 	
+main()
